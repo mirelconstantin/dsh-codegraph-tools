@@ -1,0 +1,9 @@
+# Build outputs and editor residue.
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# A local index built by `codegraph init` while verifying the plugin. It is a
+# cache owned by the user's CLI, never a source artifact to commit.
+.codegraph/

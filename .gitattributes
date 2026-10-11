@@ -1,0 +1,6 @@
+# Normalise line endings in the repository so a Windows checkout cannot commit
+# CRLF into text files that CI then checks for a dirty tree.
+* text=auto eol=lf
+
+# Binary artifacts are never line-ending-normalised.
+*.svg text

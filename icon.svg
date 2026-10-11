@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="dsh-codegraph-tools">
+  <!--
+    The code graph: nodes and the edges between them, on the house tile.
+    A symbol, a caller and a callee, wired as the plugin wires them.
+  -->
+  <rect width="200" height="200" fill="#131413"/>
+  <g stroke="#4ADE80" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <line x1="100" y1="52" x2="52" y2="140"/>
+    <line x1="100" y1="52" x2="148" y2="140"/>
+    <line x1="52" y1="140" x2="148" y2="140"/>
+  </g>
+  <g fill="#131413" stroke="#4ADE80" stroke-width="7">
+    <circle cx="100" cy="52" r="24"/>
+    <circle cx="52" cy="140" r="24"/>
+    <circle cx="148" cy="140" r="24"/>
+  </g>
+  <g fill="#4ADE80">
+    <circle cx="100" cy="52" r="9"/>
+    <circle cx="52" cy="140" r="9"/>
+    <circle cx="148" cy="140" r="9"/>
+  </g>
+</svg>

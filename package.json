@@ -1,0 +1,71 @@
+{
+  "name": "dsh-codegraph-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CodeGraph semantic code intelligence as native harness tools: one call returns symbols, call paths and blast radius instead of a crawl.",
+  "icon": "./icon.svg",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./tools": "./src/entry-tools.js",
+    "./prompt": "./src/entry-prompt.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "package.json"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-plugins",
+    "cordis",
+    "plugin",
+    "codegraph",
+    "code-graph",
+    "static-analysis"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mirelconstantin/dsh-codegraph-tools.git"
+  },
+  "homepage": "https://github.com/mirelconstantin/dsh-codegraph-tools#readme",
+  "bugs": {
+    "url": "https://github.com/mirelconstantin/dsh-codegraph-tools/issues"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "~3.18.4"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "compatibility": {
+      "dshReleases": {
+        "0.2.0-rc.2": "compatible"
+      }
+    }
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "test": "node scripts/check-plugin.mjs && node scripts/check-patch.mjs",
+    "test:live": "node scripts/live.mjs"
+  }
+}

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # The plugin contract: the loader edge cases, configuration, tool
+      # registration, prompt visibility, content bounding and the CLI seam.
+      - name: Test
+        run: npm test
+
+      # The bundle patch must keep resolving against the package, and every
+      # published export must stay inside the packed file list.
+      - name: Check the package
+        run: node scripts/check-patch.mjs
+
+      # A pull request must never leave the working tree dirty. The step is
+      # pinned to bash because the shell on windows-latest is PowerShell, where
+      # `||` between commands is a parser error rather than a short circuit.
+      - name: Fail on an uncommitted diff
+        shell: bash
+        run: |
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            git --no-pager diff >&2
+            echo "The working tree is dirty after verification." >&2
+            exit 1
+          fi

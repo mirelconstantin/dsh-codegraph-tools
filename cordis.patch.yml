@@ -1,0 +1,65 @@
+# dsh-codegraph-tools — CodeGraph semantic code intelligence as native harness tools.
+#
+# This layer provides one service, nine model-facing tools, and the
+# system-prompt guidance that tells every model this codebase already has a
+# graph. Upstream's `codegraph` CLI is spawned as a managed child through
+# ctx.subprocess, so the harness owns the process range and a host exit reaps
+# every query even when a plugin disposer never runs. There is no child server
+# to supervise: the index is a set of files on disk, owned by the user's CLI.
+#
+# Plugin paths are relative, so they resolve next to this file. Nothing here
+# resolves through node_modules, which keeps the layer working no matter how the
+# package is linked.
+- insert:
+    # 1. Owns the service and publishes the `codeGraph` service.
+    - id: codegraph-runtime
+      name: './src/index.js'
+      config:
+        # The codegraph executable. Left empty on purpose so it resolves through
+        # PATH, which is where both `npm i -g @colbymchenry/codegraph` and the
+        # platform installer put it. Set an absolute path to pin a specific
+        # build; a relative path is rejected at load.
+        cliPath: ''
+        # The project used when neither the call nor the session names one. Empty
+        # uses the harness home. Most sessions should leave this empty: every
+        # tool prefers the session's own working directory over it.
+        defaultRoot: ''
+        # Build or refresh a project that has no usable index instead of only
+        # answering from one. Turn this off for a machine where indexing is not
+        # wanted; the tools then report not-initialized and say how to fix it.
+        autoInit: true
+        # Re-sync a project whose index is older than this before the first query
+        # against it, so an answer never describes code that has since been
+        # edited. 0 disables the check. A build on a large repository is the
+        # expensive operation this guards.
+        staleAfterHours: 24
+        # Deadlines. `status` is the command every other tool waits on first and
+        # the slow one on a large root: measured on this machine against the
+        # harness home (509 files, not a git repository, so codegraph's change
+        # detection cannot take the git fast path), `status --json` costs
+        # 14.8s cold and 1.1s warm, while `query --json` costs 0.6s and
+        # `affected --json` 0.7s. The probe budget has to clear the cold end of
+        # that band rather than half of it.
+        queryTimeoutMs: 90000
+        initTimeoutMs: 600000
+        versionTimeoutMs: 90000
+        shutdownTimeoutMs: 2000
+        # Output bounds, applied per call unless the model asks otherwise.
+        defaultMaxChars: 20000
+        defaultMaxResults: 20
+        # How many hops codegraph_impact walks by default.
+        defaultDepth: 2
+        # How long one successful index-status answer is reused before the probe
+        # runs again. Measured on the same index: `status --json` is 14.8s cold /
+        # 1.1s warm while `query --json` is 0.6s, so re-probing before every
+        # query would spend up to 25x the cost of the query it gates. Thirty
+        # minutes covers a whole session, so a warm session probes once.
+        statusTtlMs: 1800000
+    # 2. The model-facing tools.
+    - id: codegraph-tools
+      name: './src/entry-tools.js'
+      inject: [codeGraph]
+    # 3. The system-prompt guidance.
+    - id: codegraph-prompt
+      name: './src/entry-prompt.js'
+      inject: [codeGraph]
